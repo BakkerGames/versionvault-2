@@ -1,5 +1,8 @@
-﻿using System;
+﻿// TreeRoutines.cs - 10/22/2018
+
+using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace VV
 {
@@ -39,19 +42,66 @@ namespace VV
             return result;
         }
 
-        private static bool IgnoreFile(string baseFileName, JObject ignoreList)
+        private static bool IgnoreFile(string name, JObject ignoreList)
         {
-            return false;
-        }
-
-        private static bool IgnoreDir(string baseSubDirName, JObject ignoreList)
-        {
-            foreach (string ignoreItem in (JArray)ignoreList.GetValueOrNull("ignoredirs"))
+            foreach (string ignoreItem in (JArray)ignoreList.GetValueOrNull("ignorefiles"))
             {
-                if (baseSubDirName.Equals(ignoreItem, StringComparison.OrdinalIgnoreCase))
+                if (name.Equals(ignoreItem, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
+                else if (ignoreItem.StartsWith("!"))
+                {
+                    if (RegexMatches(name, ignoreItem.Substring(1)))
+                    {
+                        return false;
+                    }
+                }
+                else if (ignoreItem.Contains("*") || ignoreItem.Contains("?"))
+                {
+                    if (RegexMatches(name, ignoreItem))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static bool IgnoreDir(string name, JObject ignoreList)
+        {
+            foreach (string ignoreItem in (JArray)ignoreList.GetValueOrNull("ignoredirs"))
+            {
+                if (name.Equals(ignoreItem, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+                else if (ignoreItem.StartsWith("!"))
+                {
+                    if (RegexMatches(name, ignoreItem.Substring(1)))
+                    {
+                        return false;
+                    }
+                }
+                else if (ignoreItem.Contains("*") || ignoreItem.Contains("?"))
+                {
+                    if (RegexMatches(name, ignoreItem))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static bool RegexMatches(string name, string ignoreItem)
+        {
+            // change ? and * to proper regular expressions
+            Regex rx = new Regex($"^{ignoreItem.Replace(".", "\\.").Replace("?", ".").Replace("*", ".*")}$"
+                , RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            if (rx.IsMatch(name))
+            {
+                return true;
             }
             return false;
         }

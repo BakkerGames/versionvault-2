@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿// DirItem.cs - 10/22/2018
+
+using System.Collections.Generic;
 
 namespace VV
 {
