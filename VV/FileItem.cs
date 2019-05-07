@@ -1,4 +1,8 @@
-﻿using System;
+﻿// FileItem.cs - 05/06/2019
+
+using Common.JSON;
+using System;
+using System.IO;
 
 namespace VV
 {
@@ -19,6 +23,19 @@ namespace VV
         public FileItem(string name)
         {
             Name = name;
+        }
+
+        public FileItem(string name, string path)
+        {
+            Name = name;
+            string fullpath = $"{path}\\{name}";
+            if (File.Exists(fullpath))
+            {
+                FileInfo fi = new FileInfo(fullpath);
+                Size = fi.Length;
+                UTCDate = fi.LastWriteTimeUtc;
+                MD5 = MD5Utilities.CalcMD5(fullpath);
+            }
         }
 
         public override string ToString()

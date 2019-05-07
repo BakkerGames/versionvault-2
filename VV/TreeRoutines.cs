@@ -1,5 +1,6 @@
-﻿// TreeRoutines.cs - 10/22/2018
+﻿// TreeRoutines.cs - 05/06/2019
 
+using Common.JSON;
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -27,7 +28,7 @@ namespace VV
                 string baseFileName = currFile.Substring(currFile.LastIndexOf("\\") + 1);
                 if (!IgnoreFile(baseFileName, ignoreList))
                 {
-                    result.FileList.Add(new FileItem(baseFileName));
+                    result.FileList.Add(new FileItem(baseFileName, currDirFull));
                 }
             }
             foreach (string subDir in Directory.GetDirectories(currDirFull))
@@ -44,18 +45,23 @@ namespace VV
 
         private static bool IgnoreFile(string name, JObject ignoreList)
         {
+            // check for "!" don't ignore first
             foreach (string ignoreItem in (JArray)ignoreList.GetValueOrNull("ignorefiles"))
             {
-                if (name.Equals(ignoreItem, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-                else if (ignoreItem.StartsWith("!"))
+                if (ignoreItem.StartsWith("!"))
                 {
                     if (RegexMatches(name, ignoreItem.Substring(1)))
                     {
                         return false;
                     }
+                }
+            }
+            // check for ignore matches next
+            foreach (string ignoreItem in (JArray)ignoreList.GetValueOrNull("ignorefiles"))
+            {
+                if (name.Equals(ignoreItem, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
                 }
                 else if (ignoreItem.Contains("*") || ignoreItem.Contains("?"))
                 {
@@ -70,18 +76,23 @@ namespace VV
 
         private static bool IgnoreDir(string name, JObject ignoreList)
         {
+            // check for "!" don't ignore first
             foreach (string ignoreItem in (JArray)ignoreList.GetValueOrNull("ignoredirs"))
             {
-                if (name.Equals(ignoreItem, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-                else if (ignoreItem.StartsWith("!"))
+                if (ignoreItem.StartsWith("!"))
                 {
                     if (RegexMatches(name, ignoreItem.Substring(1)))
                     {
                         return false;
                     }
+                }
+            }
+            // check for ignore matches next
+            foreach (string ignoreItem in (JArray)ignoreList.GetValueOrNull("ignoredirs"))
+            {
+                if (name.Equals(ignoreItem, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
                 }
                 else if (ignoreItem.Contains("*") || ignoreItem.Contains("?"))
                 {
