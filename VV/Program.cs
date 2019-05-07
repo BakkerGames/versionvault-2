@@ -2,6 +2,7 @@
 
 using Common.JSON;
 using System;
+using System.IO;
 
 namespace VV
 {
@@ -11,6 +12,14 @@ namespace VV
         {
             // todo check parameters
             string startPath = "D:\\Projects\\Common.JSON";
+            if (!File.Exists($"{startPath}\\.vvconfig"))
+            {
+                Console.WriteLine(".vvconfig file not found");
+                return;
+            }
+            JObject vvconfig = JObject.Parse(File.ReadAllText($"{startPath}\\.vvconfig"));
+            Console.WriteLine(vvconfig.ToString(JsonFormat.Indent));
+            Console.WriteLine(vvconfig.GetValue("VVPath"));
             JObject ignoreList = new JObject();
             JArray ignoreDirs = new JArray();
             ignoreDirs.Add("bin");
@@ -24,8 +33,8 @@ namespace VV
             ignoreList.Add("ignoredirs", ignoreDirs);
             ignoreList.Add("ignorefiles", ignoreFiles);
             DirItem currTree = TreeRoutines.BuildTree(startPath, ".", ignoreList);
-            // todo check tree vs dir/files
-            Console.WriteLine(currTree.ToString(JsonFormat.Indent));
+            File.WriteAllText($"{startPath}\\.vvinfo", currTree.ToString(JsonFormat.Indent));
+            Console.Write("Done...");
             Console.ReadLine();
         }
     }
