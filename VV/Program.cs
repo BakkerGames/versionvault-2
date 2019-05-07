@@ -28,12 +28,21 @@ namespace VV
             JArray ignoreFiles = new JArray();
             ignoreFiles.Add(".*");
             ignoreFiles.Add("!.gitignore");
-            ignoreFiles.Add("!*.cs");
-            ignoreFiles.Add("*.*");
             ignoreList.Add("ignoredirs", ignoreDirs);
             ignoreList.Add("ignorefiles", ignoreFiles);
             DirItem currTree = TreeRoutines.BuildTree(startPath, ".", ignoreList);
-            File.WriteAllText($"{startPath}\\.vvinfo", currTree.ToString(JsonFormat.Indent));
+            string vvPath = (string)vvconfig.GetValue("VVPath");
+
+            vvPath = "D:\\VV2\\Common.JSON"; // ### for testing
+
+            //VVBackup.BackupTree(startPath, vvPath, currTree);
+            VVBackup.BackupTree(startPath, vvPath, currTree);
+            if (!Directory.Exists($"{vvPath}\\.vvsnapshot"))
+            {
+                Directory.CreateDirectory($"{vvPath}\\.vvsnapshot");
+            }
+            File.WriteAllText($"{vvPath}\\.vvsnapshot\\{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}.json", 
+                currTree.ToString(JsonFormat.Indent));
             Console.Write("Done...");
             Console.ReadLine();
         }
