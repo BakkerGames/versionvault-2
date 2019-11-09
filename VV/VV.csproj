@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="DirItem.cs" />
     <Compile Include="FileItem.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MD5Utilities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
