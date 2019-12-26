@@ -12,7 +12,15 @@ namespace VV
         {
             try
             {
-                string startPath = args[0];
+                string startPath;
+                if (args.Length >= 1)
+                {
+                    startPath = args[0];
+                }
+                else
+                {
+                    startPath = ".";
+                }
                 if (!File.Exists($"{startPath}\\.vvconfig"))
                 {
                     Console.WriteLine(".vvconfig file not found");
