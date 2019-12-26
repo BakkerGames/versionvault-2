@@ -23,23 +23,31 @@ namespace VV
                 }
                 if (!File.Exists($"{startPath}\\.vvconfig"))
                 {
-                    Console.WriteLine(".vvconfig file not found");
-                    return 1;
+                    throw new SystemException(".vvconfig file not found");
                 }
+
                 JObject vvconfig = JObject.Parse(File.ReadAllText($"{startPath}\\.vvconfig"));
                 string vvPath = (string)vvconfig.GetValue("VVPath");
+                if (vvPath.Contains("\\VersionVault\\"))
+                {
+                    throw new SystemException(".vvconfig target path must be updated");
+                }
 
                 Console.WriteLine($"Vaulting files from \"{startPath}\" to \"{vvPath}\"");
 
                 // build ignoreList
                 JObject ignoreList = new JObject();
                 JArray ignoreDirs = new JArray();
+                ignoreDirs.Add(".*");
                 ignoreDirs.Add("bin");
                 ignoreDirs.Add("obj");
-                ignoreDirs.Add(".*");
+                ignoreDirs.Add("EXE");
+                ignoreDirs.Add("packages");
                 JArray ignoreFiles = new JArray();
                 ignoreFiles.Add(".*");
+                ignoreFiles.Add("*.lnk");
                 ignoreFiles.Add("!.gitignore");
+                ignoreFiles.Add("!.gitattributes");
                 ignoreList.Add("ignoredirs", ignoreDirs);
                 ignoreList.Add("ignorefiles", ignoreFiles);
 
