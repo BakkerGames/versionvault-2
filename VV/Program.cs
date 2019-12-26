@@ -20,6 +20,7 @@ namespace VV
             JObject vvconfig = JObject.Parse(File.ReadAllText($"{startPath}\\.vvconfig"));
             Console.WriteLine(vvconfig.ToString(JsonFormat.Indent));
             Console.WriteLine(vvconfig.GetValue("VVPath"));
+
             JObject ignoreList = new JObject();
             JArray ignoreDirs = new JArray();
             ignoreDirs.Add("bin");
@@ -30,19 +31,24 @@ namespace VV
             ignoreFiles.Add("!.gitignore");
             ignoreList.Add("ignoredirs", ignoreDirs);
             ignoreList.Add("ignorefiles", ignoreFiles);
+
             DirItem currTree = TreeRoutines.BuildTree(startPath, ".", ignoreList);
             string vvPath = (string)vvconfig.GetValue("VVPath");
 
             vvPath = "D:\\VV2\\Common.JSON"; // ### for testing
 
-            //VVBackup.BackupTree(startPath, vvPath, currTree);
             VVBackup.BackupTree(startPath, vvPath, currTree);
             if (!Directory.Exists($"{vvPath}\\.vvsnapshot"))
             {
                 Directory.CreateDirectory($"{vvPath}\\.vvsnapshot");
             }
-            File.WriteAllText($"{vvPath}\\.vvsnapshot\\{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}.json", 
-                currTree.ToString(JsonFormat.Indent));
+            VVSnapshot vvs = new VVSnapshot();
+            vvs.UTCDate = DateTime.UtcNow;
+            vvs.Data = currTree.ToJson();
+            vvs.DataMD5 = MD5Utilities.CalcMD5FromString(currTree.ToString());
+            File.WriteAllText(
+                $"{vvPath}\\.vvsnapshot\\{vvs.UTCDate?.ToString("yyyyMMddHHmmss")}.json", 
+                vvs.ToString(JsonFormat.Indent));
             Console.Write("Done...");
             Console.ReadLine();
         }

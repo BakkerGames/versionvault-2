@@ -34,7 +34,7 @@ namespace VV
                 FileInfo fi = new FileInfo(fullpath);
                 Size = fi.Length;
                 UTCDate = fi.LastWriteTimeUtc;
-                MD5 = MD5Utilities.CalcMD5(fullpath);
+                MD5 = MD5Utilities.CalcMD5FromFile(fullpath);
             }
         }
 
