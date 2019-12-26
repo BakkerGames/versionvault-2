@@ -1,4 +1,4 @@
-﻿// FileItem.cs - 05/06/2019
+﻿// FileItem.cs - 12/26/2019
 
 using Common.JSON;
 using System;
@@ -15,6 +15,7 @@ namespace VV
         public long? Size = 0;
         public DateTime? UTCDate;
         public string MD5;
+        public bool? Changed = false;
 
         public FileItem()
         {
@@ -65,6 +66,7 @@ namespace VV
             {
                 result.Add("md5", MD5);
             }
+            result.Add("changed", Changed);
             return result;
         }
     }

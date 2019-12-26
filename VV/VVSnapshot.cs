@@ -12,6 +12,7 @@ namespace VV
         public string AppName = "vv";
         public decimal? Version = 2;
         public DateTime? UTCDate;
+        public long Changes = 0;
         public string DataMD5;
         public JObject Data;
 
@@ -31,6 +32,7 @@ namespace VV
             result.Add("appname", AppName);
             result.Add("version", Version);
             result.Add("utcdate", UTCDate.Value.ToString(_dateTimeFormat));
+            result.Add("changes", Changes);
             result.Add("datamd5", DataMD5);
             result.Add("data", Data);
             return result;

@@ -4,8 +4,9 @@ namespace VV
 {
     public static class VVBackup
     {
-        public static void BackupTree(string startpath, string vvpath, DirItem currTree)
+        public static long BackupTree(string startpath, string vvpath, DirItem currTree)
         {
+            long count = 0;
             foreach (FileItem fi in currTree.FileList)
             {
                 string targetPath = $"{vvpath}\\{fi.Name}";
@@ -13,6 +14,7 @@ namespace VV
                 {
                     Directory.CreateDirectory(targetPath);
                 }
+                // get the last period position in case there are more than one
                 int periodPos = fi.Name.LastIndexOf(".");
                 string targetFilename;
                 if (periodPos < 0)
@@ -23,15 +25,20 @@ namespace VV
                 {
                     targetFilename = $"{fi.MD5}{fi.Name.Substring(periodPos)}";
                 }
-                if (!File.Exists($"{targetPath}\\{targetFilename}"))
+                string target = $"{targetPath}\\{targetFilename}";
+                if (!File.Exists(target))
                 {
-                    File.Copy($"{startpath}\\{fi.Name}", $"{targetPath}\\{targetFilename}");
+                    File.Copy($"{startpath}\\{fi.Name}", target);
+                    File.SetAttributes(target, FileAttributes.ReadOnly);
+                    count++;
+                    fi.Changed = true;
                 }
             }
             foreach (DirItem di in currTree.DirList)
             {
-                BackupTree($"{startpath}\\{di.Name}", $"{vvpath}\\{di.Name}", di);
+                count += BackupTree($"{startpath}\\{di.Name}", $"{vvpath}\\{di.Name}", di);
             }
+            return count;
         }
     }
 }
