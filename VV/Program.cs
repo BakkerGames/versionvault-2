@@ -6,7 +6,7 @@ using System.IO;
 
 namespace VV
 {
-    class Program
+    public class Program
     {
         static int Main(string[] args)
         {
@@ -46,19 +46,26 @@ namespace VV
                 JArray ignoreFiles = new JArray();
                 ignoreFiles.Add(".*");
                 ignoreFiles.Add("*.lnk");
+                ignoreFiles.Add("*.par2");
                 ignoreFiles.Add("!.gitignore");
                 ignoreFiles.Add("!.gitattributes");
                 ignoreList.Add("ignoredirs", ignoreDirs);
                 ignoreList.Add("ignorefiles", ignoreFiles);
 
                 // build list of files in a tree
-                DirItem currTree = TreeRoutines.BuildTree(startPath, ".", ignoreList);
+                Console.WriteLine("Building tree...");
+                long treeCount = 0;
+                DirItem currTree = TreeRoutines.BuildTree(startPath, ".", ignoreList, ref treeCount);
+                Console.WriteLine();
 
                 // update base path to new VV2 directory
                 vvPath = vvPath.Replace("\\VersionVault\\", "\\VV2\\");
 
                 // backup the entire list of files
-                long changeCount = VVBackup.BackupTree(startPath, vvPath, currTree);
+                Console.WriteLine("Vaulting files...");
+                long vaultCount = 0;
+                long changeCount = VVBackup.BackupTree(startPath, vvPath, currTree, ref vaultCount);
+                Console.WriteLine();
                 if (changeCount == 0)
                 {
                     Console.WriteLine("No changes found");

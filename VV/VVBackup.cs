@@ -1,14 +1,18 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace VV
 {
     public static class VVBackup
     {
-        public static long BackupTree(string startpath, string vvpath, DirItem currTree)
+        public static long BackupTree(string startpath, string vvpath, DirItem currTree, ref long vaultCount)
         {
             long count = 0;
             foreach (FileItem fi in currTree.FileList)
             {
+                vaultCount++;
+                Console.Write("\r");
+                Console.Write(vaultCount);
                 string targetPath = $"{vvpath}\\{fi.Name}";
                 if (!Directory.Exists(targetPath))
                 {
@@ -36,7 +40,7 @@ namespace VV
             }
             foreach (DirItem di in currTree.DirList)
             {
-                count += BackupTree($"{startpath}\\{di.Name}", $"{vvpath}\\{di.Name}", di);
+                count += BackupTree($"{startpath}\\{di.Name}", $"{vvpath}\\{di.Name}", di, ref vaultCount);
             }
             return count;
         }

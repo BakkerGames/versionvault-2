@@ -9,7 +9,7 @@ namespace VV
 {
     public static partial class TreeRoutines
     {
-        public static DirItem BuildTree(string startPath, string currDir, JObject ignoreList)
+        public static DirItem BuildTree(string startPath, string currDir, JObject ignoreList, ref long treeCount)
         {
             // todo build the tree
             string baseDirName = currDir.Substring(currDir.LastIndexOf("\\") + 1);
@@ -29,6 +29,9 @@ namespace VV
                 if (!IgnoreFile(baseFileName, ignoreList))
                 {
                     result.FileList.Add(new FileItem(baseFileName, currDirFull));
+                    treeCount++;
+                    Console.Write("\r");
+                    Console.Write(treeCount);
                 }
             }
             foreach (string subDir in Directory.GetDirectories(currDirFull))
@@ -36,7 +39,7 @@ namespace VV
                 string baseSubDirName = subDir.Substring(subDir.LastIndexOf("\\") + 1);
                 if (!IgnoreDir(baseSubDirName, ignoreList))
                 {
-                    result.DirList.Add(BuildTree(currDirFull, baseSubDirName, ignoreList));
+                    result.DirList.Add(BuildTree(currDirFull, baseSubDirName, ignoreList, ref treeCount));
                 }
             }
             // done
