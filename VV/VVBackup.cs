@@ -8,6 +8,11 @@ namespace VV
         public static long BackupTree(string startpath, string vvpath, DirItem currTree, ref long vaultCount)
         {
             long count = 0;
+            if (!Directory.Exists(startpath))
+            {
+                // must have changed after snapshot
+                return count;
+            }
             foreach (FileItem fi in currTree.FileList)
             {
                 vaultCount++;
@@ -29,10 +34,11 @@ namespace VV
                 {
                     targetFilename = $"{fi.MD5}{fi.Name.Substring(periodPos)}";
                 }
+                string source = $"{startpath}\\{fi.Name}";
                 string target = $"{targetPath}\\{targetFilename}";
-                if (!File.Exists(target))
+                if (File.Exists(source) && !File.Exists(target))
                 {
-                    File.Copy($"{startpath}\\{fi.Name}", target);
+                    File.Copy(source, target);
                     File.SetAttributes(target, FileAttributes.ReadOnly);
                     count++;
                     fi.Changed = true;
